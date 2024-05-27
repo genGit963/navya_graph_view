@@ -1,21 +1,12 @@
-import React, {useState} from 'react';
+import React, {useMemo, useState} from 'react';
 import {StyleSheet, Text, View} from 'react-native';
 import {LineGraph, GraphPoint} from 'react-native-graph';
 import {dummy_date} from '../data/dummy_data';
-
-type WeeklyData = {
-  date: string;
-  open: string;
-  high: string;
-  low: string;
-  close: string;
-  adjustedClose: string;
-  volume: string;
-  dividendAmount: string;
-};
+import {GraphRange} from 'react-native-graph/lib/typescript/LineGraphProps';
+import {WeeklyData2 } from '../models/stock';
 
 const Chart = () => {
-  const dataArray: WeeklyData[] = Object.entries(
+  const dataArray: WeeklyData2[] = Object.entries(
     dummy_date['Weekly Adjusted Time Series'],
   ).map(([date, data]) => ({
     date,
@@ -28,11 +19,11 @@ const Chart = () => {
     dividendAmount: data['7. dividend amount'],
   }));
 
-//   console.log('convert: ', dataArray); // debugging
+  //   console.log('convert: ', dataArray); // debugging
 
   const specificPrices = dataArray.map(item => {
     return {
-      value: Number(item.adjustedClose),
+      value: Number(item.open),
       date: new Date(item.date),
     };
   });
@@ -46,13 +37,46 @@ const Chart = () => {
     setCurrentPoint(point);
   };
 
+  // ---------------- range ---------------
+  const highestDate = useMemo(
+    () =>
+      graphPoints.length !== 0 && graphPoints[graphPoints.length - 1] != null
+        ? graphPoints[graphPoints.length - 1]!.date
+        : undefined,
+    [graphPoints],
+  );
+
+  const range: GraphRange | undefined = useMemo(() => {
+    // if range is disabled, default to infinite range (undefined)
+    // if (!enableRange) return undefined;
+    if (graphPoints.length !== 0 && highestDate != null) {
+      return {
+        x: {
+          min: graphPoints[0]!.date,
+          max: new Date(highestDate.getTime() + 50 * 1000 * 60 * 60 * 24),
+        },
+        y: {
+          min: 0,
+          max: 200,
+        },
+      };
+    } else {
+      return {
+        y: {
+          min: 0,
+          max: 200,
+        },
+      };
+    }
+  }, [highestDate, graphPoints]);
+
   return (
     <View style={styles.Container}>
       <View style={styles.Numbers}>
         <Text style={styles.CurrentValue}>
           {currentPoint.date.toDateString()}
         </Text>
-        <Text style={[styles.CurrentValue, {color: 'blue', fontSize:24}]}>
+        <Text style={[styles.CurrentValue, {color: 'blue', fontSize: 24}]}>
           ${parseFloat(currentPoint.value.toFixed(2))}
         </Text>
       </View>
@@ -65,11 +89,15 @@ const Chart = () => {
         gradientFillColors={['#0073CF', '#FFF']}
         enablePanGesture
         onPointSelected={handleSelectedPoint}
-        // range={}
+        range={range}
         enableIndicator
         indicatorPulsating
         enableFadeInMask
       />
+
+      <View>
+
+      </View>
     </View>
   );
 };
@@ -85,8 +113,8 @@ const styles = StyleSheet.create({
     width: '98%',
     height: 'auto',
     marginVertical: 10,
-    borderBottomWidth: 2,
-    borderBottomColor: 'lightblue',
+    borderBottomWidth: 1,
+    borderBottomColor: 'lightgray',
   },
   CurrentValue: {
     fontSize: 18,
