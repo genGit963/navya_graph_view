@@ -16,6 +16,7 @@ interface GrapProps {
 export default function Graph({priceType = 'low', data}: GrapProps) {
   const font = useFont(require('../assets/Inter-Medium.ttf'), 10);
 
+  // destructuring to time series format
   const dataArray: WeeklyData[] = Object.entries(
     data['Weekly Adjusted Time Series'],
   ).map(([date, data]: any) => ({
@@ -25,7 +26,8 @@ export default function Graph({priceType = 'low', data}: GrapProps) {
     low: data['3. low'],
     close: data['4. close'],
   }));
-
+  
+  // graph-points acc. to specific price_type: low, high, close, open
   const specificPrices = dataArray.map(item => {
     switch (priceType) {
       case 'close':
@@ -52,12 +54,13 @@ export default function Graph({priceType = 'low', data}: GrapProps) {
     }
   });
 
+// graph line press-sensing
   const {state, isActive} = useChartPressState({
     x: specificPrices[0].date,
     y: {value: specificPrices[0].value},
   });
 
-  // mute the warning
+  // muting the warning
   if (process.env.NODE_ENV !== 'production') {
     const originalWarn = console.error;
     console.error = (...args) => {

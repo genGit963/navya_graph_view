@@ -1,3 +1,10 @@
+/**
+ * It was just initial try to study data structure and 
+ * restructuring process in graphical view 
+ * go to /components/Graph.tsx 
+ * file for actual graph view
+ */
+
 import React, {useMemo, useState} from 'react';
 import {StyleSheet, Text, View} from 'react-native';
 import {LineGraph, GraphPoint} from 'react-native-graph';
