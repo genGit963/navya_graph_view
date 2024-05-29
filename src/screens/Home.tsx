@@ -90,7 +90,7 @@ const HomeScreen = () => {
     };
     fetchStockChange();
   }, [ddSymbol]);
-
+  console.log('env: ', process.env.API_BASE);
   return (
     <View style={style.Home}>
       <ScrollView>
@@ -119,8 +119,9 @@ const HomeScreen = () => {
             Note
           </Text>
           <Text>
-            Due to API calling limits 25/day, I have used dummy data copied from postman, or
-            to see api calling uncomment : /*------- API calling --------*/ just below line.
+            Due to API calling limits 25/day, I have used dummy data copied from
+            postman, or to see api calling uncomment : /*------- API calling
+            --------*/ just below line.
           </Text>
           <Text>1. Look console messages and play with dropdown. </Text>
           <Text>
